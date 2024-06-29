@@ -6,6 +6,7 @@ require('dotenv').config();
 let db;
 const dbConnectionStr = process.env.DB_STRING;
 const dbName = 'meme-break';
+const dbCollectionName = process.env.DB_COLLECTION_NAME;
 //
 const PORT = process.env.PORT || 2121;
 
@@ -22,7 +23,7 @@ app.use(express.json());
 
 
 app.get('/', (request, response) => {
-    db.collection('memeInfo').find().sort({ likes: -1 }).toArray()
+    db.collection(dbCollectionName).find().sort({ likes: -1 }).toArray()
         .then(data => {
             response.render('index.ejs', { info: data });
         })
@@ -30,10 +31,7 @@ app.get('/', (request, response) => {
 });
 
 app.put('/addonelike', (request, response) => {
-    console.log('Adding like');
-    console.log(request.body.memeId);
-    console.log(request.body.likes);
-    db.collection('memeInfo').updateOne({ memeId: request.body.memeId }, {
+    db.collection(dbCollectionName).updateOne({ memeId: request.body.memeId }, {
         $set: {
             likes: request.body.likes + 1
         }
@@ -46,7 +44,6 @@ app.put('/addonelike', (request, response) => {
             response.json('Like Added');
         })
         .catch(error => console.error(error));
-
 });
 
 app.listen(process.env.PORT || PORT, () => {
